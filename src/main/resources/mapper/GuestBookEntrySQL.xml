@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.multi.mini6.loginpage.dao.GuestBookDAO">
+
+    <!-- 방명록 추가 -->
+    <insert id="addEntry" parameterType="guestBookVO">
+        INSERT INTO guest_book (author_email, recipient_email, message, modifiedAt, createdAt)
+        VALUES (#{authorEmail}, #{recipientEmail}, #{message}, #{modifiedAt}, #{createdAt})
+    </insert>
+
+    <!-- 방명록 리스트 가져오기 -->
+    <select id="getGuestBookEntryList" resultType="guestBookVO">
+        SELECT *
+        FROM guest_book
+    </select>
+
+    <!-- 방명록 삭제 -->
+    <delete id="deleteEntry">
+        DELETE
+        FROM guest_book
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 방명록 수정 -->
+    <update id="updateEntry" parameterType="guestBookVO">
+        UPDATE guest_book
+        SET author_email    = #{authorEmail},
+            recipient_email = #{recipientEmail},
+            message         = #{message},
+            modifiedAt      = #{modifiedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 방명록 아이디로 검색해서 가져오기 -->
+    <select id="getEntryById" parameterType="int" resultType="guestBookVO">
+        SELECT *
+        FROM guest_book
+        WHERE id = #{id}
+    </select>
+
+
+</mapper>
