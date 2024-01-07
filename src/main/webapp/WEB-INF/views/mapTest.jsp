@@ -11,6 +11,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="apikey.js"></script>
 <%--        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=feb6a3c31b035f2a61bd30ac29509330"></script>--%>
+    <jsp:include page="/WEB-INF/views/apikey.jsp"/>
         <script type="text/javascript">
             let mapkey = ""
             $.ajax({

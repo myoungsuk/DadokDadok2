@@ -10,7 +10,7 @@
 
         <div class="logo">
             <a href="/mainpage/index" class="logo-link">
-                <img src="../resources/assets/img/logo.png" alt="DadokDadok Logo" class="logo-image">
+                <img src="../../resources/assets/img/logo.png" alt="DadokDadok Logo" class="logo-image">
                 <span class="logo-text">DadokDadok</span>
             </a>
         </div>

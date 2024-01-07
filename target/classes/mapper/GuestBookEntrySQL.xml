@@ -43,7 +43,7 @@
         SELECT id, author_email, author_nickname, recipient_email, recipient_nickname, message, modifiedAt, createdAt
         FROM guest_book
         WHERE recipient_email = #{email}
-        ORDER BY modifiedAt DESC
+        ORDER BY createdAt DESC
         LIMIT 5
     </select>
 

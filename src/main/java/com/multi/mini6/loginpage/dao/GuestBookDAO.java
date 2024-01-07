@@ -34,8 +34,22 @@ public class GuestBookDAO {
     }
 
     //방명록 아이디로 검색해서 가져오기
-    public GuestBookVO getEntryById(int id) {
-        return sqlSession.selectOne("getEntryById", id);
+    public GuestBookVO getEntryByEmail(String email) {
+        return sqlSession.selectOne("getEntryByEmail", email);
+    }
+
+    //방명록 5개만 가져오기
+    public List<GuestBookVO> getEntriesByEmail(String email) {
+        return sqlSession.selectList("getEntriesByEmail", email); // 'getEntriesByEmail' MyBatis 쿼리 ID
+    }
+
+    //방명록 전체 가져오기
+    public List<GuestBookVO> getAllEntriesByEmail(String email) {
+        return sqlSession.selectList("getAllEntriesByEmail", email);
+    }
+
+    public GuestBookVO getGuestBookCommnetById(int id) {
+    	return sqlSession.selectOne("getGuestBookCommnetById", id);
     }
 
 }

@@ -16,4 +16,6 @@ DadokDadok 버전관리 레포입니다
 - GuestBookDAO.java
 - GuestBookService.java
 - GuestBoookController.java
+- guestbookDetail.jsp
+
 

@@ -42,4 +42,9 @@ public class MapController {
         log.info("mapTest");
     }
 
+    @GetMapping("/apiTest")
+    public void apiTest() {
+        log.info("apiTest");
+    }
+
 }

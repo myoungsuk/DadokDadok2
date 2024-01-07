@@ -24,10 +24,21 @@ public class GuestBookService {
         log.info("getGuestBookEntryList() invoked.");
         return guestBookDAO.getGuestBookEntryList();
     }
+    // 이메일을 기반으로 방명록을 가져오는 메소드 5개만가져옴
+    public List<GuestBookVO> getGuestBookEntriesByEmail(String email) {
+        log.info("getGuestBookEntriesByEmail() invoked for email: " + email);
+        return guestBookDAO.getEntriesByEmail(email); // DAO가 이메일을 기반으로 방명록을 가져올 수 있도록 메소드 구현
+    }
 
-    public GuestBookVO getGuestBookById(int id) {
+    // 이메일을 기반으로 방명록을 가져오는 메소드 전체 가져옴
+    public List<GuestBookVO> getAllGuestBookEntriesByEmail(String email) {
+        log.info("getAllGuestBookEntriesByEmail() invoked.");
+        return guestBookDAO.getAllEntriesByEmail(email); // DAO가 이메일을 기반으로 방명록을 가져올 수 있도록 메소드 구현
+    }
+
+    public GuestBookVO getGuestBookByEmail(String email) {
         log.info("getGuestBookEntryById() invoked.");
-        return guestBookDAO.getEntryById(id);
+        return guestBookDAO.getEntryByEmail(email);
     }
 
     public void deleteGuestBook(int id) {
@@ -40,4 +51,8 @@ public class GuestBookService {
         guestBookDAO.updateEntry(guestBookVO);
     }
 
+    public GuestBookVO getGuestBookCommnetById(int id) {
+    	log.info("getGuestBookCommnetById() invoked.");
+    	return guestBookDAO.getGuestBookCommnetById(id);
+    }
 }

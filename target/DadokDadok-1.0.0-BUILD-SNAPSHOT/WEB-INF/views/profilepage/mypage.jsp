@@ -39,7 +39,8 @@
     <link href="../resources/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
     <link href="../resources/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     <link href="../resources/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <!-- Template Main CSS File -->
     <link href="../resources/assets/css/style.css" rel="stylesheet">
 
@@ -69,6 +70,11 @@
             height: 300px; /* 원하는 크기로 설정하세요 */
             object-fit: cover; /* 이미지가 div를 벗어나지 않도록 설정합니다 */
         }
+
+        .guestbook-link:hover .sidebar-title {
+            color: #fd5c28; /* 마우스 오버 시 색상 변경 */
+        }
+
     </style>
 </head>
 
@@ -80,8 +86,6 @@
 <!-- ======= Header ======= -->
 <jsp:include page="/WEB-INF/views/header.jsp"/>
 <!-- End Header -->
-
-
 
 
 <main id="main">
@@ -320,7 +324,28 @@
                                 <input type="text">
                                 <button type="submit"><i class="bi bi-search"></i></button>
                             </form>
-                        </div><!-- End sidebar search formn-->
+                        </div><!-- End sidebar search form-->
+
+                        <a href="/profilepage/GuestBookPage/guestbookDetail" class="guestbook-link">
+                            <h3 class="sidebar-title">Guestbook</h3>
+                        </a>
+                        <div class="guestbook-entry">
+                        </div>
+
+                        <div class="sidebar-item">
+                        </div>
+
+                        <div class="guestbook-entries">
+                            <form id="guestbookForm" method="post">
+                                <div class="form-group">
+                                    <textarea id="guestbookMessage" class="form-control" rows="4" required
+                                              placeholder="Leave a message"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                            <br>
+                        </div><!-- End guestbook entries -->
+
 
                         <h3 class="sidebar-title">Categories</h3>
                         <div class="sidebar-item categories">
@@ -412,6 +437,56 @@
 
 <!-- Template Main JS File -->
 <script src="../resources/assets/js/main.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/profilepage/GuestBookPage/myGuestBookEntries', // 여기서 URL은 REST API 엔드포인트와 일치해야 합니다.
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                var guestbookEntryDiv = $('.guestbook-entry');
+                guestbookEntryDiv.empty(); // 기존 내용을 비웁니다.
+
+                $.each(response, function (index, entry) {
+                    guestbookEntryDiv.append('<p>' + entry.author_nickname + ': ' + entry.message + '</p>');
+                });
+            },
+            error: function (error) {
+                console.log('Error fetching guest book entries:', error);
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#guestbookForm').on('submit', function (e) {
+            e.preventDefault(); // 폼 기본 제출 이벤트 방지
+
+            var message = $('#guestbookMessage').val(); // textarea에서 메시지 내용을 가져옴
+            var postData = {
+                message: message // 메시지 내용
+            };
+
+            $.ajax({
+                url: '/profilepage/GuestBookPage/addGuestBook', // 서버의 POST 엔드포인트
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(postData), // JSON 형식으로 변환
+                success: function (response) {
+                    alert('Guest book entry added successfully.'); // 성공 메시지 표시
+                    $('#guestbookMessage').val(''); // 메시지 입력 필드 초기화
+                    //페이지 새로고침
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error adding guest book entry: ' + error); // 오류 메시지 표시
+                }
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
