@@ -110,15 +110,44 @@
                 <div id="emailFeedbackSuccess" class="valid-feedback" style="display: none;">
                     사용 가능한 이메일입니다.
                 </div>
+                <div id="emailInvalidFeedback" class="invalid-feedback" style="display: none;">
+                    유효하지 않은 이메일 형식입니다.
+                </div>
+
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <br><br>
+                    <label for="password">Password(반드시 8자 이상 특수문자를 포함해 주세요)</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Password"
                            required>
                 </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                           placeholder="Confirm Password" required>
+                    <div id="passwordMatchFeedback" class="invalid-feedback" style="display: none;">
+                        비밀번호가 일치하지 않습니다.
+                    </div>
+                </div>
 
                 <div class="form-group">
-                    <label for="phoneNum">Phone</label>
+                    <br><br>
+                    <label for="addr1">Address</label>
+                    <br>
+                    <input class="form-control" style="width: 40%; display: inline;" placeholder="우편번호" name="zipcode" id="addr1" type="text" readonly="readonly"/>
+                    <button type="button" class="btn btn-primary" onclick="execPostCode();"><i class="fa fa-search"></i> 우편번호 찾기</button>
+                </div>
+
+                <div class="form-group">
+                    <input class="form-control" style="top: 5px;" placeholder="도로명 주소" name="address" id="addr2" type="text" readonly="readonly"/>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" placeholder="상세주소" name="detail_address" id="addr3" type="text"/>
+                </div>
+
+                <div class="form-group">
+                    <br><br>
+                    <label for="phoneNum">Phone(전화번호를 양식에 맞게 작성해주세요 예)010-0000-0000</label>
                     <input type="text" class="form-control" id="phoneNum" name="phoneNum" placeholder="Phone" required>
                 </div>
 
@@ -143,11 +172,56 @@
 <script src="../resources/assets/vendor/waypoints/noframework.waypoints.js"></script>
 <script src="../resources/assets/vendor/php-email-form/validate.js"></script>
 
+<!-- Daum 우편번호 서비스 -->
+<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <!-- Template Main JS File -->
 <script src="../resources/assets/js/main.js"></script>
 
 <script>
     $(document).ready(function () {
+        // 이메일 형식 검사
+        function validateEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+
+        function validatePassword(password) {
+            var re = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+            return re.test(password);
+        }
+
+        // 비밀번호 일치 검사
+        function matchPassword() {
+            var password = $('#password').val();
+            var confirmPassword = $('#confirmPassword').val();
+            return password === confirmPassword;
+        }
+
+        $('#password, #confirmPassword').on('input', function () {
+            var password = $('#password').val();
+            if (!validatePassword(password)) {
+                $('#signupButton').prop('disabled', true);
+            } else if (!matchPassword()) {
+                $('#passwordMatchFeedback').show();
+                $('#signupButton').prop('disabled', true);
+            } else {
+                $('#passwordMatchFeedback').hide();
+                $('#signupButton').prop('disabled', false);
+            }
+        });
+
+        $('#email').on('input', function () {
+            var email = $(this).val();
+            if (!validateEmail(email)) {
+                // 유효하지 않은 이메일 형식
+                $('#emailInvalidFeedback').show();
+                $('#signupButton').prop('disabled', true);
+            } else {
+                // 유효한 이메일 형식
+                $('#emailInvalidFeedback').hide();
+                $('#signupButton').prop('disabled', false);
+            }
+        });
         // 초기 상태에서 '회원가입하기' 버튼 비활성화
         $('#signupButton').prop('disabled', true);
 
@@ -188,9 +262,68 @@
             }
         });
     });
-
 </script>
+<script>
+    // Daum 우편번호 찾기 함수
+    function execPostCode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 도로명 주소 변수
+                var fullRoadAddr = data.roadAddress;
+                // 도로명 조합형 주소 변수
+                var extraRoadAddr = '';
 
+                // 법정동명이 있을 경우 추가
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraRoadAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                    extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 도로명, 지번 조합형 주소가 있을 경우 추가
+                if(extraRoadAddr !== ''){
+                    extraRoadAddr = ' (' + extraRoadAddr + ')';
+                }
+                // 최종 주소 문자열 생성
+                if(fullRoadAddr !== ''){
+                    fullRoadAddr += extraRoadAddr;
+                }
+
+                // 우편번호와 주소 정보 입력 필드에 값 설정
+                $('#addr1').val(data.zonecode);
+                $('#addr2').val(fullRoadAddr); // addr2는 상세 주소를 입력받는 필드의 ID
+            }
+        }).open();
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        // 전화번호 유효성 검사 함수
+        function validatePhoneNumber(phoneNumber) {
+            var re = /^01[0-1,6-9]-[0-9]{3,4}-[0-9]{4}$/;
+            return re.test(phoneNumber);
+        }
+
+        $('#phoneNum').on('input', function () {
+            var phoneNumber = $(this).val();
+            if (!validatePhoneNumber(phoneNumber)) {
+                $(this).addClass('is-invalid'); // 유효하지 않은 경우 클래스 추가
+            } else {
+                $(this).removeClass('is-invalid'); // 유효한 경우 클래스 제거
+            }
+        });
+
+        // 폼 제출 시 전화번호 유효성 검사
+        $('#signupForm').submit(function (event) {
+            var phoneNumber = $('#phoneNum').val();
+            if (!validatePhoneNumber(phoneNumber)) {
+                event.preventDefault(); // 폼 제출 방지
+                alert('유효하지 않은 전화번호 형식입니다.');
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

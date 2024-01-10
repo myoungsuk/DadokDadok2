@@ -17,6 +17,10 @@ public class MemberVO {
     private String name;
     private String phoneNum;
 
+    private String zipcode;
+    private String address;
+    private String detail_address;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
     private String nickname;
