@@ -14,6 +14,9 @@
         <result property="password" column="password"/>
         <result property="name" column="name"/>
         <result property="phoneNum" column="phone_num"/>
+        <result property="zipcode" column="zipcode"/>
+        <result property="address" column="address"/>
+        <result property="detail_address" column="detail_address"/>
         <result property="createdAt" column="createdAt"/>
         <result property="nickname" column="nickname"/>
         <result property="info" column="info"/>
@@ -45,9 +48,10 @@
     <!-- 회원가입 -->
     <insert id="insertMember">
         INSERT INTO member
-            (email, password, name, phone_num, nickname, info, user_img)
-        VALUES (#{email}, #{password}, #{name}, #{phoneNum}, #{nickname}, #{info}, #{userImg})
+        (email, password, name, phone_num, nickname, info, user_img, zipcode, address, detail_address)
+        VALUES (#{email}, #{password}, #{name}, #{phoneNum}, #{nickname}, #{info}, #{userImg}, #{zipcode}, #{address}, #{detail_address})
     </insert>
+
 
     <!-- 권한 부여 -->
     <insert id="insertMemberAuthority">
@@ -70,6 +74,9 @@
             m.nickname,
             m.info,
             m.user_img,
+            m.zipcode,
+            m.address,
+            m.detail_address,
             a.authority_id,
             a.authority_name
         FROM
@@ -91,6 +98,9 @@
             m.nickname,
             m.info,
             m.user_img,
+            m.zipcode,
+            m.address,
+            m.detail_address,
             a.authority_id,
             a.authority_name
         FROM
@@ -106,7 +116,10 @@
         UPDATE member
         SET
             nickname  = #{nickname},
-            info      = #{info}
+            info      = #{info},
+            zipcode   = #{zipcode},
+            address   = #{address},
+            detail_address = #{detail_address}
         WHERE member_id = #{member_id}
     </update>
 
