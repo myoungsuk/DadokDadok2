@@ -61,6 +61,7 @@
             color: #333; /* 글씨 색상 */
             /*margin-left: 5px; !* 이미지와 텍스트 간격 *!*/
         }
+
         /* 푸터를 화면 하단에 고정 */
         /*#footer {*/
         /*    position: fixed;*/
@@ -178,14 +179,17 @@
                                 <input type="file" id="userImg" name="userImg" accept="image/*"
                                        onchange="chooseImage(this)">
                                 <label for="userImg" class="img-upload-label">
-                                    <c:set var="dbPath" value="/Users/Kang/Downloads/apache-tomcat-8.5.95/bin/upload-dir/"/>
-                                    <c:set var="defaultImagePath" value="${pageContext.request.contextPath}/resources/assets/img/profile/profile.png"/>
+                                    <c:set var="dbPath"
+                                           value="/Users/Kang/Downloads/apache-tomcat-8.5.95/bin/upload-dir/"/>
+                                    <c:set var="defaultImagePath"
+                                           value="${pageContext.request.contextPath}/resources/assets/img/profile/profile.png"/>
                                     <c:set var="imagePath" value="${member.userImg}"/>
                                     <c:set var="relativePath" value="${fn:replace(imagePath, dbPath, '')}"/>
                                     <c:choose>
                                         <c:when test="${not empty imagePath}">
                                             <!-- 사용자가 이미지를 업로드한 경우 -->
-                                            <img src="${pageContext.request.contextPath}/upload-dir/${relativePath}" class="img-fluid" alt="Profile">
+                                            <img src="${pageContext.request.contextPath}/upload-dir/${relativePath}"
+                                                 class="img-fluid" alt="Profile">
                                         </c:when>
                                         <c:otherwise>
                                             <!-- 기본 이미지 표시 -->
@@ -225,8 +229,25 @@
                                            data-placement="top" title="변경할 수 없는 사안입니다">
                                 </div>
 
+                                <div class="form-group">
+                                    <br><br>
+                                    <label for="addr1">Address</label>
+                                    <br>
+                                    <input class="form-control bg-light" style="width: 40%; display: inline;" placeholder="우편번호" name="zipcode" id="addr1" type="text" value="${member.zipcode}" readonly/>
+                                    <button type="button" class="btn btn-primary" onclick="execPostCode();"><i class="fa fa-search"></i> 우편번호 찾기</button>
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label for="address">도로명 주소</label>
+                                    <input type="text" class="form-control bg-light" id="address" name="address" value="${member.address}" readonly data-toggle="tooltip" data-placement="top" title="변경할 수 없는 사안입니다">
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="상세주소" name="detail_address" id="addr3" type="text" value="${member.detail_address}"/>
+                                </div>
+
                                 <!-- 닉네임 필드 -->
                                 <div class="form-group mb-4">
+                                    <br><br>
                                     <label for="nickname">닉네임</label>
                                     <input type="text" class="form-control" id="nickname" name="nickname"
                                            value="${member.nickname}" required>
@@ -234,6 +255,7 @@
 
                                 <!-- 자기소개 필드 -->
                                 <div class="form-group mb-4">
+                                    <br><br>
                                     <label for="info">자기소개</label>
                                     <textarea class="form-control" id="info" name="info"
                                               rows="3">${member.info}</textarea>
@@ -246,22 +268,27 @@
 
 
                         <!-- 비밀번호 변경 탭 -->
-                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                             aria-labelledby="v-pills-profile-tab">
                             <!-- 계정 설정 폼 -->
                             <form id="passwordChangeForm">
                                 <div class="mb-3">
                                     <label for="currentPassword" class="form-label">현재 비밀번호</label>
-                                    <input type="password" class="form-control" id="currentPassword" placeholder="현재 비밀번호를 입력하세요" required>
+                                    <input type="password" class="form-control" id="currentPassword"
+                                           placeholder="현재 비밀번호를 입력하세요" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newPassword" class="form-label">새 비밀번호</label>
-                                    <input type="password" class="form-control" id="newPassword" placeholder="새 비밀번호를 입력하세요" required>
+                                    <label for="newPassword" class="form-label">새 비밀번호(반드시 8자 이상 특수문자를 포함해 주세요)</label>
+                                    <input type="password" class="form-control" id="newPassword"
+                                           placeholder="새 비밀번호를 입력하세요" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="confirmNewPassword" class="form-label">새 비밀번호 확인</label>
-                                    <input type="password" class="form-control" id="confirmNewPassword" placeholder="새 비밀번호를 다시 입력하세요" required>
+                                    <input type="password" class="form-control" id="confirmNewPassword"
+                                           placeholder="새 비밀번호를 다시 입력하세요" required>
                                 </div>
-                                <button type="button" id="submitPasswordChange" class="btn btn-primary">변경 사항 저장</button>
+                                <button type="button" id="submitPasswordChange" class="btn btn-primary">변경 사항 저장
+                                </button>
                             </form>
                         </div>
 
@@ -331,8 +358,45 @@
 <script src="../../../resources/assets/vendor/waypoints/noframework.waypoints.js"></script>
 <script src="../../../resources/assets/vendor/php-email-form/validate.js"></script>
 
+<!-- Daum 우편번호 서비스 -->
+<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <!-- Template Main JS File -->
 <script src="../../../resources/assets/js/main.js"></script>
+
+<script>
+    // Daum 우편번호 찾기 함수
+    function execPostCode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 도로명 주소 변수
+                var fullRoadAddr = data.roadAddress;
+                // 도로명 조합형 주소 변수
+                var extraRoadAddr = '';
+
+                // 법정동명이 있을 경우 추가
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraRoadAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                    extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 도로명, 지번 조합형 주소가 있을 경우 추가
+                if(extraRoadAddr !== ''){
+                    extraRoadAddr = ' (' + extraRoadAddr + ')';
+                }
+                // 최종 주소 문자열 생성
+                if(fullRoadAddr !== ''){
+                    fullRoadAddr += extraRoadAddr;
+                }
+
+                // 우편번호와 주소 정보 입력 필드에 값 설정
+                $('#addr1').val(data.zonecode);
+                $('#addr2').val(fullRoadAddr); // addr2는 상세 주소를 입력받는 필드의 ID
+            }
+        }).open();
+    }
+</script>
 
 <script>
     $(function () {
@@ -350,8 +414,44 @@
         }
     }
 
-    $(document).ready(function() {
-        $('#submitPasswordChange').on('click', function() {
+    $(document).ready(function () {
+        // 비밀번호 유효성 검사 함수
+        function validatePassword(password) {
+            var re = /^(?=.*[!@#$%^&*~])[A-Za-z\d!@#$%^&*~]{8,}$/;
+            return re.test(password);
+        }
+
+        // 비밀번호 일치 검사 함수
+        function matchPassword() {
+            var newPassword = $('#newPassword').val();
+            var confirmNewPassword = $('#confirmNewPassword').val();
+            return newPassword === confirmNewPassword;
+        }
+
+        $('#newPassword, #confirmNewPassword').on('input', function () {
+            var newPassword = $('#newPassword').val();
+            var isPasswordValid = validatePassword(newPassword);
+            var isPasswordMatch = matchPassword();
+
+            // 새 비밀번호 유효성 표시
+            if (!isPasswordValid) {
+                $('#newPassword').addClass('is-invalid');
+            } else {
+                $('#newPassword').removeClass('is-invalid');
+            }
+
+            // 비밀번호 일치 여부 표시
+            if (!isPasswordMatch) {
+                $('#confirmNewPassword').addClass('is-invalid');
+            } else {
+                $('#confirmNewPassword').removeClass('is-invalid');
+            }
+
+            // 버튼 활성화/비활성화
+            $('#submitPasswordChange').prop('disabled', !isPasswordValid || !isPasswordMatch);
+        });
+
+        $('#submitPasswordChange').on('click', function () {
             var currentPassword = $('#currentPassword').val();
             var newPassword = $('#newPassword').val();
             var confirmNewPassword = $('#confirmNewPassword').val();
@@ -365,13 +465,13 @@
                     newPassword: newPassword,
                     confirmNewPassword: confirmNewPassword
                 }),
-                success: function(response) {
+                success: function (response) {
                     // 비밀번호 변경 성공 시, 사용자에게 알립니다.
                     alert('비밀번호가 변경되었습니다.');
                     // 로그인 성공 후 로그아웃 페이지로 리다이렉션
                     window.location.href = '/loginpage/customLogout';
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     // 비밀번호 변경 실패 시, 오류 메시지를 사용자에게 보여줍니다.
                     alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
                 }
