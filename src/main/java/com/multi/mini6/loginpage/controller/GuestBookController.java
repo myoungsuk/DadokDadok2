@@ -1,5 +1,6 @@
 package com.multi.mini6.loginpage.controller;
 
+import com.multi.mini6.bookpage.vo.PageVO;
 import com.multi.mini6.loginpage.service.GuestBookService;
 import com.multi.mini6.loginpage.vo.CustomUser;
 import com.multi.mini6.loginpage.vo.GuestBookVO;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Log4j2
@@ -24,6 +27,13 @@ import java.util.List;
 public class GuestBookController {
 
     final private GuestBookService guestBookService;
+
+    // 방명록 페이지
+    @PreAuthorize("permitAll()")
+    @GetMapping("/guestbookDetail")
+    public void getMyGuestBookAllEntries() {
+        log.info("getMyGuestBookAllEntries() invoked.");
+    }
 
     // 현재 로그인한 사용자의 이메일을 반환하는 메소드
     @GetMapping("/currentUserEmail")
@@ -38,7 +48,7 @@ public class GuestBookController {
     @PostMapping("/addGuestBook")
     @ResponseBody
     public ResponseEntity<?> addGuestBook(@RequestBody GuestBookVO guestBookVO, Authentication authentication) {
-        CustomUser customUser = (CustomUser)authentication.getPrincipal();
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
         String email = customUser.getUsername(); // 현재 로그인한 사용자의 이메일
         String nickname = customUser.getNickname(); // 현재 로그인한 사용자의 닉네임
 
@@ -70,7 +80,7 @@ public class GuestBookController {
     @ResponseBody
     public ResponseEntity<List<GuestBookVO>> getMyGuestBookEntries() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = ((CustomUser)authentication.getPrincipal()).getUsername(); // CustomUser의 getUsername 메서드 사용
+        String email = ((CustomUser) authentication.getPrincipal()).getUsername(); // CustomUser의 getUsername 메서드 사용
 
         List<GuestBookVO> myGuestBookEntries = guestBookService.getGuestBookEntriesByEmail(email);
         if (myGuestBookEntries.isEmpty()) {
@@ -80,57 +90,69 @@ public class GuestBookController {
     }
 
 
-    // 방명록 페이지
-    @PreAuthorize("permitAll()")
-    @GetMapping("/guestbookDetail")
-    public void getMyGuestBookAllEntries() {
-        log.info("getMyGuestBookAllEntries() invoked.");
-    }
-
     // 방명록 전체 반환기능
+//    @GetMapping("/guestbookDetailAPI")
+//    @ResponseBody
+//    public ResponseEntity<List<GuestBookVO>> getAllMyGuestBookEntries() {
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = ((CustomUser) authentication.getPrincipal()).getUsername(); // CustomUser의 getUsername 메서드 사용
+//
+//        List<GuestBookVO> myGuestBookAllEntries = guestBookService.getAllGuestBookEntriesByEmail(email);
+//        if (myGuestBookAllEntries == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 방명록 정보가 없으면 404 Not Found 상태 코드 반환
+//        }
+//        return new ResponseEntity<>(myGuestBookAllEntries, HttpStatus.OK); // 방명록 정보와 200 OK 상태 코드 반환
+//    }
     @GetMapping("/guestbookDetailAPI")
     @ResponseBody
-    public ResponseEntity<List<GuestBookVO>> getAllMyGuestBookEntries() {
+    public ResponseEntity<?> getAllMyGuestBookEntries(@RequestParam(defaultValue = "1") int page,
+                                                      @RequestParam(defaultValue = "10") int pageSize) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = ((CustomUser)authentication.getPrincipal()).getUsername(); // CustomUser의 getUsername 메서드 사용
+        String email = ((CustomUser) authentication.getPrincipal()).getUsername();
 
-        List<GuestBookVO> myGuestBookAllEntries = guestBookService.getAllGuestBookEntriesByEmail(email);
-        if (myGuestBookAllEntries == null) {
+        int totalItemCount = guestBookService.countGuestBookEntriesByEmail(email);
+        PageVO pageVO = new PageVO(page, pageSize, totalItemCount);
+
+        List<GuestBookVO> myGuestBookEntries = guestBookService.getAllGuestBookEntriesByEmail(email, pageVO.getPageSize(), pageVO.getOffset());
+        if (myGuestBookEntries == null || myGuestBookEntries.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("guestBookEntries", myGuestBookEntries);
+        response.put("pageInfo", pageVO);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    // 방명록 대댓글 반환기능
+    @GetMapping("/guestbookDetailAPI/{parent_id}")
+    @ResponseBody
+    public ResponseEntity<List<GuestBookVO>> getChildGuestBookEntries(@PathVariable int parent_id) {
+        List<GuestBookVO> childGuestBookEntries = guestBookService.getChildGuestBookEntries(parent_id);
+        if (childGuestBookEntries == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 방명록 정보가 없으면 404 Not Found 상태 코드 반환
         }
-        return new ResponseEntity<>(myGuestBookAllEntries, HttpStatus.OK); // 방명록 정보와 200 OK 상태 코드 반환
+        return new ResponseEntity<>(childGuestBookEntries, HttpStatus.OK); // 방명록 정보와 200 OK 상태 코드 반환
     }
 
-
-    @GetMapping("/getGuestBookList")
-    public ModelAndView getGuestBookList() {
-        log.info("getGuestBookList() invoked.");
-        List<GuestBookVO> guestBookList = guestBookService.getGuestBookList();
-        ModelAndView mav = new ModelAndView("guestBookList"); // 여기서 "guestBookList"는 JSP 파일의 이름입니다.
-        mav.addObject("guestBookEntries", guestBookList);
-        return mav;
-    }
-
-
-    @GetMapping("/getGuestBookById/{email}")
-    public ModelAndView getGuestBookByEmail(@PathVariable String email) {
-        log.info("getGuestBookById() invoked with id: " + email);
-        GuestBookVO guestBook = guestBookService.getGuestBookByEmail(email);
-        ModelAndView mav = new ModelAndView("guestBookView"); // 적절한 뷰 이름 설정
-        mav.addObject("guestBook", guestBook);
-        return mav;
-    }
 
     //방명록 삭제
     @DeleteMapping("/deleteGuestBook/{id}")
     @ResponseBody
     public ResponseEntity<?> deleteGuestBook(@PathVariable int id) {
-        log.info("deleteGuestBook() invoked with id: " + id);
         guestBookService.deleteGuestBook(id);
         return ResponseEntity.ok("Guest book entry deleted successfully.");
     }
-
+    //방명록 부모댓글 삭제를 위해 대댓글 삭제후 부모댓글 삭제
+    @DeleteMapping("/deleteAllGuestBook/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteGuestBookComment(@PathVariable int id) {
+        guestBookService.deleteAllGuestBook(id);
+        return ResponseEntity.ok("Guest book entry deleted successfully.");
+    }
+    //방명록 수정, 삭제를 위해 아이디로 검색
     @GetMapping("/guestbookDetail/{id}")
     @ResponseBody
     public ResponseEntity<GuestBookVO> getGuestBookDetail(@PathVariable int id) {
@@ -142,9 +164,42 @@ public class GuestBookController {
     @PutMapping("/updateGuestBook")
     @ResponseBody
     public ResponseEntity<?> updateGuestBook(@RequestBody GuestBookVO guestBookVO) {
-        log.info("updateGuestBook() invoked with guestBookVO: " + guestBookVO);
         guestBookService.updateGuestBook(guestBookVO);
         return ResponseEntity.ok("Guest book entry updated successfully.");
     }
+
+
+    //방명록 대댓글 작성 기능
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER')")
+    @PostMapping("/addGuestBookComment/{parent_id}")
+    @ResponseBody
+    public ResponseEntity<?> addGuestBookComment(@RequestBody GuestBookVO guestBookVO, @PathVariable int parent_id, Authentication authentication) {
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+        String email = customUser.getUsername(); // 현재 로그인한 사용자의 이메일
+        String nickname = customUser.getNickname(); // 현재 로그인한 사용자의 닉네임
+
+        // 작성자 이메일과 닉네임 설정
+        guestBookVO.setAuthor_email(email);
+        guestBookVO.setAuthor_nickname(nickname);
+        guestBookVO.setParent_id(parent_id);
+
+        // 수신자 이메일이 설정되지 않은 경우, 작성자 이메일을 수신자 이메일로 설정
+        if (guestBookVO.getRecipient_email() == null) {
+            guestBookVO.setRecipient_email(email);
+            guestBookVO.setRecipient_nickname(nickname); // 수신자 닉네임도 작성자 닉네임으로 설정
+        }
+
+        // 나머지 수신자 닉네임 설정 로직 추가 (예를 들어, 수신자 닉네임을 받아와서 설정하는 등)
+
+        log.info("Adding guest book entry: {}", guestBookVO);
+        guestBookService.addGuestBookComment(guestBookVO); // 서비스를 통해 방명록 정보 저장
+
+        // 메시지 내용이 비어 있는지 확인
+        if (guestBookVO.getMessage() == null || guestBookVO.getMessage().trim().isEmpty()) {
+            return new ResponseEntity<>("Message content cannot be empty", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Guest book entry added successfully.", HttpStatus.CREATED); // 생성된 상태 코드 반환
+    }
+
 
 }

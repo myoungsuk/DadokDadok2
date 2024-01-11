@@ -14,4 +14,5 @@ public class GuestBookVO {
     private String message;
     private Date modifiedAt;
     private Date createdAt;
+    private int parent_id;
 }
