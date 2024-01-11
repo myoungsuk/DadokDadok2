@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.multi.mini6.bookpage.mapper.BookDAO">
+<mapper namespace="com.multi.mini6.bookpage.dao.BookDAO">
 
 	<insert id="insertOne" parameterType="BookVO">
 		INSERT INTO book (book_ISBN, book_name, book_content, book_author, book_publisher, book_createdAt, book_genre, book_img)

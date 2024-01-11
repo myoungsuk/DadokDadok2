@@ -110,7 +110,8 @@
         <div class="guestbook-entry-form">
             <form id="guestbookForm" method="post" style="width: 60%; margin: auto;">
                 <div class="form-group">
-                    <textarea id="guestbookMessage" class="form-control" rows="4" required placeholder="방명록에 메시지를 남겨주세요."></textarea>
+                    <textarea id="guestbookMessage" class="form-control" rows="4" required
+                              placeholder="방명록에 메시지를 남겨주세요."></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">방명록 남기기</button>
             </form>
@@ -123,10 +124,14 @@
             <div class="guestbook-list" data-aos="fade-up" data-aos-delay="100">
                 <!-- AJAX를 통해 여기에 방명록 목록이 로드됩니다 -->
             </div>
+            <div class="pagination" data-aos="fade-up" data-aos-delay="200">
+                <!-- AJAX를 통해 여기에 페이지네이션 버튼이 로드됩니다 -->
+            </div>
         </div>
 
         <!-- Edit Guestbook Modal -->
-        <div class="modal fade" id="editGuestBookModal" tabindex="-1" role="dialog" aria-labelledby="editGuestBookModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editGuestBookModal" tabindex="-1" role="dialog"
+             aria-labelledby="editGuestBookModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -144,6 +149,31 @@
                             </div>
                             <button type="submit" class="btn btn-primary">수정하기</button>
                             <button type="button" class="btn btn-secondary" id="cancelModalButton">취소</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editGuestBookCommentModal" tabindex="-1" role="dialog"
+             aria-labelledby="editGuestBookModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editGuestBookCommentModalLabel">댓글 수정</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editGuestBookCommentForm">
+                            <input type="hidden" id="editGuestBooCommentkId">
+                            <div class="form-group">
+                                <label for="editMessage">메시지</label>
+                                <textarea class="form-control" id="editCommentMessage" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">수정하기</button>
+                            <button type="button" class="btn btn-secondary" id="cancelCommentModalButton">취소</button>
                         </form>
                     </div>
                 </div>
@@ -174,79 +204,201 @@
 
 <script>
     //모달창 오류로 인한 수동 취소 버튼
-    $(document).ready(function() {
-        $('#cancelModalButton').on('click', function() {
+    $(document).ready(function () {
+        $('#cancelModalButton').on('click', function () {
             $('#editGuestBookModal').modal('hide');
+        });
+    });
+    $(document).ready(function () {
+        $('#cancelCommentModalButton').on('click', function () {
+            $('#editGuestBookCommentModal').modal('hide');
         });
     });
 
 
     $(document).ready(function () {
         // 현재 로그인한 사용자의 이메일
-        var loggedInEmail = '현재 사용자 이메일'; // 현재 로그인한 사용자의 이메일을 적절한 방법으로 설정하세요.
+        var loggedInEmail = '현재 사용자 이메일';
 
         $.ajax({
             url: '/profilepage/GuestBookPage/currentUserEmail',
             type: 'GET',
-            success: function(response) {
+            success: function (response) {
                 loggedInEmail = response;
+                // 첫 페이지의 방명록 데이터 로드
+                loadGuestBookEntries(1, 10); // 여기서 1은 첫 페이지, 10은 페이지당 항목 수
             },
-            error: function(error) {
+            error: function (error) {
                 console.log('사용자 이메일을 가져오는데 실패했습니다:', error);
             }
         });
 
-        // 방명록 데이터 로드 AJAX 요청
-        $.ajax({
-            url: '/profilepage/GuestBookPage/guestbookDetailAPI',
-            type: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                var guestbookListDiv = $('.guestbook-list');
-                guestbookListDiv.empty();
+        function loadGuestBookEntries(page, pageSize) {
+            $.ajax({
+                url: '/profilepage/GuestBookPage/guestbookDetailAPI',
+                type: 'GET',
+                data: {page: page, pageSize: pageSize},
+                dataType: 'json',
+                success: function (response) {
+                    var guestbookListDiv = $('.guestbook-list');
+                    guestbookListDiv.empty();
 
-                $.each(response, function (index, entry) {
-                    var buttons = '';
-                    if (entry.author_email === loggedInEmail) {
-                        // 현재 로그인한 사용자가 작성자인 경우 버튼 표시
-                        buttons = '<button class="btn btn-sm btn-info" onclick="editGuestBookEntry(' + entry.id + ')">수정</button>' +
-                            ' <button class="btn btn-sm btn-danger" onclick="deleteGuestBookEntry(' + entry.id + ')">삭제</button>';
-                    }
-                    var commentbuttons = '<button class="btn btn-sm btn-primary btn-rounded" onclick="commentGuestBookEntry(' + entry.id + ')">댓글달기</button>';
+                    // 방명록 엔트리 목록을 페이지에 추가
+                    $.each(response.guestBookEntries, function (index, entry) {
+                        var buttons = '';
+                        if (entry.author_email === loggedInEmail) {
+                            buttons = '<button class="btn btn-sm btn-info" onclick="editGuestBookEntry(' + entry.id + ')">수정</button>' + ' ' +
+                                '<button class="btn btn-sm btn-danger" onclick="deleteGuestBookEntry(' + entry.id + ')">삭제</button>' + ' ';
 
-                    var entryHtml = '<div class="col-md-12 guestbook-entry">' +
-                        '<div class="guestbook-content">' +
-                        '<h4>' + entry.author_nickname + '</h4>' +
-                        '<p>' + entry.message + '</p>' +
-                        '<span>' + new Date(entry.modifiedAt).toLocaleString() + ' ' + '</span>' +
-                        buttons + ' ' + // 버튼 추가
-                        commentbuttons + //댓글 버튼 추가
-                        '<hr></div></div>';
-                    guestbookListDiv.append(entryHtml);
+                        }
+                        var replybutton = '<button class="btn btn-sm btn-light" onclick="toggleReplyForm(' + entry.id + ')">댓글 작성하기(on/off)</button>';
+                        var replySectionHtml = '<div id="replies-' + entry.id + '" class="replies-section"></div>' +
+                            '<div class="reply-form" id="replyForm-' + entry.id + '" style="display:none;">' + '<br>' +
+                            '<textarea class="form-control" id="replyText-' + entry.id + '" placeholder="대댓글을 입력하세요"></textarea>' +
+                            '<button class="btn btn-primary" onclick="submitReply(' + entry.id + ')">대댓글 등록</button>' +
+                            '</div>';
+
+                        var entryHtml = '<div class="col-md-12 guestbook-entry">' +
+                            '<div class="guestbook-content">' +
+                            '<h4><strong>' + entry.author_nickname + '</strong></h4>' +
+                            '<p>' + entry.message + '</p>' +
+                            '<span>' + new Date(entry.modifiedAt).toLocaleString() + ' </span>' +
+                            buttons + replybutton +
+                            replySectionHtml +
+                            '<hr></div></div>';
+
+                        guestbookListDiv.append(entryHtml);
+                        loadAndDisplayReplies(entry.id); // 해당 댓글의 대댓글 로드
+                    });
+
+                    // 페이징 컨트롤을 페이지에 추가
+                    createPagination(response.pageInfo);
+                },
+                error: function (error) {
+                    console.log('방명록 데이터를 가져오는데 실패했습니다:', error);
+                }
+            });
+        }
+
+        function createPagination(pageInfo) {
+            var paginationDiv = $('.pagination');
+            paginationDiv.empty();
+
+            for (var i = 1; i <= pageInfo.totalPages; i++) {
+                var pageButton = $('<button>').text(i);
+                if (i === pageInfo.currentPage) {
+                    pageButton.addClass('active');
+                }
+                pageButton.on('click', function () {
+                    var selectedPage = $(this).text();
+                    loadGuestBookEntries(selectedPage, pageInfo.pageSize);
                 });
-            },
-            error: function (error) {
-                console.log('방명록 데이터를 가져오는데 실패했습니다:', error);
+                paginationDiv.append(pageButton);
             }
-        });
+        }
     });
 
+
+    // 대댓글 폼 토글 함수
+    function toggleReplyForm(commentId) {
+        var replyForm = $('#replyForm-' + commentId);
+        replyForm.toggle();
+    }
+
+
+    // 대댓글 제출 함수
+    function submitReply(commentId) {
+        // 대댓글 제출 로직...
+        var replyText = $('#replyText-' + commentId).val();
+        var replyData = {
+            author_email: '로그인한 사용자 이메일', // 적절한 값으로 설정
+            author_nickname: '로그인한 사용자 닉네임', // 적절한 값으로 설정
+            message: replyText,
+            parent_id: commentId // 원 댓글의 id
+        };
+
+        $.ajax({
+            url: '/profilepage/GuestBookPage/addGuestBookComment/' + commentId, // 서버의 대댓글 추가 API
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(replyData),
+            success: function (response) {
+                alert('대댓글이 추가되었습니다.');
+                $('#replyText-' + commentId).val('');
+                loadAndDisplayReplies(commentId);
+            },
+            error: function (error) {
+                alert('대댓글 추가 중 오류가 발생했습니다: ' + error);
+            }
+        });
+    }
+
+    // 대댓글 로드 및 표시 함수
+    function loadAndDisplayReplies(commentId) {
+        // 현재 로그인한 사용자의 이메일
+        var loggedInEmail = '현재 사용자 이메일';
+
+        $.ajax({
+            url: '/profilepage/GuestBookPage/currentUserEmail',
+            type: 'GET',
+            success: function (response) {
+                loggedInEmail = response;
+            },
+            error: function (error) {
+                console.log('사용자 이메일을 가져오는데 실패했습니다:', error);
+            }
+        });
+
+        $.ajax({
+            url: '/profilepage/GuestBookPage/guestbookDetailAPI/' + commentId, // 올바른 대댓글 API 엔드포인트로 변경하세요
+            type: 'GET',
+            dataType: 'json',
+            success: function (replies) {
+                var repliesHtml = '<div class="replies-container" style="margin-left: 20px;">'; // 대댓글에 대한 스타일링
+                $.each(replies, function (index, reply) {
+                    var buttons = '';
+                    if (reply.author_email === loggedInEmail) {
+                        // 현재 로그인한 사용자가 작성자인 경우 버튼 표시
+                        buttons =
+                            '<button class="btn btn-sm btn-info" onclick="editGuestBookCommentEntry(' + reply.id + ')">수정</button>' + ' ' +
+                            '<button class="btn btn-sm btn-danger" onclick="deleteGuestBookCommentEntry(' + reply.id + ')">삭제</button>';
+                    }
+
+                    repliesHtml +=
+                        '<hr>' +
+                        '<div class="reply">' +
+                        '<p><strong>' + reply.author_nickname + '</strong>: ' + reply.message + '</p>' +
+                        '<span>' + new Date(reply.createdAt).toLocaleString() + '</span>' + ' ' +
+                        buttons + // 버튼 추가
+                        '</div>';
+                });
+                repliesHtml += '</div>';
+                $('#replies-' + commentId).html(repliesHtml); // replies-container에 대댓글을 삽입합니다.
+            },
+            error: function (error) {
+                console.log('Error loading replies:', error);
+            }
+        });
+    }
+
+    // 방명록 수정
     function editGuestBookEntry(entryId) {
         $.ajax({
             url: '/profilepage/GuestBookPage/guestbookDetail/' + entryId,
             type: 'GET',
-            success: function(entry) {
+            success: function (entry) {
                 $('#editGuestBookId').val(entry.id);
                 $('#editMessage').val(entry.message);
                 $('#editGuestBookModal').modal('show');
             },
-            error: function(error) {
+            error: function (error) {
                 console.log('Error fetching guest book entry:', error);
             }
         });
     }
 
-    $('#editGuestBookForm').on('submit', function(e) {
+    // 방명록 수정
+    $('#editGuestBookForm').on('submit', function (e) {
         e.preventDefault();
         var updatedEntry = {
             id: $('#editGuestBookId').val(),
@@ -258,39 +410,90 @@
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(updatedEntry),
-            success: function(response) {
+            success: function (response) {
                 $('#editGuestBookModal').modal('hide');
                 alert('Guest book entry updated successfully.');
                 location.reload();
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 alert('Error updating guest book entry: ' + xhr.responseText);
             }
         });
     });
 
-
+    //방명록 대댓글까지 전체 삭제
     function deleteGuestBookEntry(entryId) {
         $.ajax({
-            url: '/profilepage/GuestBookPage/deleteGuestBook/' + entryId,
+            url: '/profilepage/GuestBookPage/deleteAllGuestBook/' + entryId,
             type: 'DELETE',
-            success: function(response) {
+            success: function (response) {
                 alert('Guest book entry deleted successfully.');
                 location.reload();
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 alert('Error deleting guest book entry: ' + xhr.responseText);
             }
         });
     }
 
-    function commentGuestBookEntry(entryId) {
-        // 댓글 로직 구현
+    // 방명록 대댓글만 삭제
+    function deleteGuestBookCommentEntry(commentId) {
+        $.ajax({
+            url: '/profilepage/GuestBookPage/deleteGuestBook/' + commentId,
+            type: 'DELETE',
+            success: function (response) {
+                alert('Guest book comment entry deleted successfully.');
+                location.reload();
+            },
+            error: function (xhr) {
+                alert('Error deleting guest book comment entry: ' + xhr.responseText);
+            }
+        });
     }
+
+    // 방명록 대댓글만 수정
+    function editGuestBookCommentEntry(replyId) {
+        $.ajax({
+            url: '/profilepage/GuestBookPage/guestbookDetail/' + replyId,
+            type: 'GET',
+            success: function (reply) {
+                $('#editGuestBookCommentId').val(reply.id);
+                $('#editCommentMessage').val(reply.message);
+                $('#editGuestBookCommentModal').modal('show');
+            },
+            error: function (error) {
+                console.log('Error fetching guest book entry:', error);
+            }
+        });
+    }
+
+    // 방명록 수정
+    $('#editGuestBookCommentForm').on('submit', function (e) {
+        e.preventDefault();
+        var updatedReply = {
+            id: $('#editGuestBookCommentId').val(),
+            message: $('#editCommentMessage').val()
+        };
+
+        $.ajax({
+            url: '/profilepage/GuestBookPage/updateGuestBook',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(updatedReply),
+            success: function (response) {
+                $('#editGuestBookCommentModal').modal('hide');
+                alert('Guest book entry updated successfully.');
+                location.reload();
+            },
+            error: function (xhr) {
+                alert('Error updating guest book entry: ' + xhr.responseText);
+            }
+        });
+    });
 </script>
 
 
-
+<!-- 방명록 등록 -->
 <script>
     $(document).ready(function () {
         $('#guestbookForm').on('submit', function (e) {
