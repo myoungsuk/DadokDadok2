@@ -163,6 +163,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- 테스트 jupitar -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- json객체를 직렬화하기 위해 라이브러리 추가 -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -261,10 +269,15 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.6.0</version>
+			<version>5.0.0</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-inline</artifactId>
+			<version>4.0.0</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- gson -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -299,6 +312,19 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${org.springframework-version}</version>
+		</dependency>
+
+		<!-- 엑셀 파일 읽기 처리 -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.0.0</version>
 		</dependency>
 
 	</dependencies>
