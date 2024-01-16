@@ -4,31 +4,6 @@
 
 <mapper namespace="com.multi.mini6.bookpage.dao.BookDAO">
 
-	<insert id="insertOne" parameterType="BookVO">
-		INSERT INTO book (book_ISBN, book_name, book_content, book_author, book_publisher, book_createdAt, book_genre, book_img)
-		VALUES (#{bookISBN}, #{bookName}, #{bookContent}, #{bookAuthor}, #{bookPublisher}, #{bookCreatedAt}, #{bookGenre}, #{bookImg})
-	</insert>
-
-	<!-- 특정 ISBN을 가진 책 조회 -->
-	<select id="selectOneByISBN" parameterType="String" resultType="BookVO">
-		SELECT * FROM book WHERE book_ISBN = #{book_ISBN}
-	</select>
-
-	<!-- 특정 책 이름을 가진 책 조회 -->
-	<select id="selectOneByName" parameterType="String" resultType="BookVO">
-		SELECT * FROM book WHERE book_name = #{book_name}
-	</select>
-
-	<!-- 모든 책 조회 -->
-	<select id="selectAll" resultType="BookVO">
-		SELECT * FROM book
-	</select>
-
-	<!-- 도서 총 개수 -->
-	<select id="getBookCount" resultType="int">
-		SELECT COUNT(*) FROM book
-	</select>
-
 	<!-- 도서 정보 페이징 처리 리스트 -->
 	<select id="getPagedBooks" parameterType="PageVO" resultType="BookVO">
 		SELECT * FROM (
@@ -49,19 +24,6 @@
 
 
 
-	<!-- 책 정보 업데이트 -->
-	<update id="updateOne" parameterType="BookVO">
-		UPDATE book
-		SET book_name = #{bookName}, book_content = #{bookContent}, book_author = #{bookAuthor},
-			book_publisher = #{bookPublisher}, book_createdAt = #{bookCreatedAt}, book_genre = #{bookGenre}, book_img = #{bookImg}
-		WHERE book_ISBN = #{book_ISBN}
-	</update>
-
-	<!-- 책 삭제 -->
-	<delete id="deleteOne" parameterType="String">
-		DELETE FROM book WHERE book_ISBN = #{book_ISBN}
-	</delete>
-
 	<!-- 책 검색 -->
 	<select id="searchBook" parameterType="String" resultType="BookVO">
 		SELECT * FROM book
@@ -72,4 +34,7 @@
 		   OR book_publisher LIKE CONCAT('%', #{book_publisher}, '%')
 		   OR CAST(book_genre AS CHAR) LIKE CONCAT('%', #{book_genre}, '%')
 	</select>
+
+
+
 </mapper>

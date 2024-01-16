@@ -69,14 +69,14 @@
             margin: auto;
         }
 
-        /* 푸터를 화면 하단에 고정 */
-        #footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            /* 푸터의 높이 및 기타 스타일링을 여기에 추가하세요 */
-        }
+        /*!* 푸터를 화면 하단에 고정 *!*/
+        /*#footer {*/
+        /*    position: fixed;*/
+        /*    left: 0;*/
+        /*    bottom: 0;*/
+        /*    width: 100%;*/
+        /*    !* 푸터의 높이 및 기타 스타일링을 여기에 추가하세요 *!*/
+        /*}*/
     </style>
 </head>
 <body>

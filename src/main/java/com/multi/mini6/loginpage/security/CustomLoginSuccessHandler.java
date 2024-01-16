@@ -34,7 +34,6 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler{@
 		// 각각 if문 처리하지 않으면 리다이렉트가 중복호출됩니다 *주의*
 		if(roleList.contains("ROLE_ADMIN")) {
 			response.sendRedirect("/mainpage/index");
-			
 			// 리다이렉트가 또 실행되지 않도록 리턴해주세요
 			return;
 		}
