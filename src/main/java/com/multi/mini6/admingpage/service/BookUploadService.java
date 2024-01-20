@@ -23,7 +23,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Log4j2
+//@Log4j2
 public class BookUploadService {
 
     final private SqlSessionFactory sqlSessionFactory;
@@ -99,14 +99,13 @@ public class BookUploadService {
                 // CSV 데이터 처리 로직
                 BooksVO booksVO = new BooksVO();
                 booksVO.setTitle(removeQuotes(values[1]));
-                booksVO.setAuthor(removeQuotes(values[2]));
                 booksVO.setPublisher(removeQuotes(values[3]));
-                booksVO.setYearOfPublication(removeQuotes(values[4]));
+                booksVO.setYear_of_publication(removeQuotes(values[4]));
                 booksVO.setIsbn(removeQuotes(values[5]));
-                booksVO.setSetIsbn(removeQuotes(values[6]));
-                booksVO.setAdditionalSymbol(removeQuotes(values[7]));
+                booksVO.setSet_isbn(removeQuotes(values[6]));
+                booksVO.setAdditional_symbol(removeQuotes(values[7]));
                 booksVO.setVolume(removeQuotes(values[8]));
-                booksVO.setSubjectClassificationNumber(removeQuotes(values[9]));
+                booksVO.setSubject_classification_number(removeQuotes(values[9]));
                 booksToSave.add(booksVO);
 
                 // 변동성이 있는데이터는 BooksLibrary 테이블에 저장하고 업데이트 하도록 처리
@@ -214,12 +213,12 @@ public class BookUploadService {
                 booksVO.setTitle(title);
                 booksVO.setAuthor(author);
                 booksVO.setPublisher(publisher);
-                booksVO.setYearOfPublication(yearOfPublication);
+                booksVO.setYear_of_publication(yearOfPublication);
                 booksVO.setIsbn(isbn);
-                booksVO.setSetIsbn(setIsbn);
-                booksVO.setAdditionalSymbol(additionalSymbol);
+                booksVO.setSet_isbn(setIsbn);
+                booksVO.setAdditional_symbol(additionalSymbol);
                 booksVO.setVolume(volume);
-                booksVO.setSubjectClassificationNumber(subjectClassificationNumber);
+                booksVO.setSubject_classification_number(subjectClassificationNumber);
 
                 BooksLibrariesVO booksLibrariesVO = new BooksLibrariesVO();
                 booksLibrariesVO.setLib_code(libCode);

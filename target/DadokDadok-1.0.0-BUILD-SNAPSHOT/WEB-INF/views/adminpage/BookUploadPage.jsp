@@ -226,7 +226,7 @@
                         var resultsHtml = '<ul class="list-group">';
                         $.each(response, function (index, library) {
                             resultsHtml += '<li class="list-group-item library-item" data-lib-code="' + library.lib_code + '">' +
-                                library.도서관명 + ' (' + library.lib_code + ')</li>';
+                                library.lib_name + ' (' + library.lib_code + ')</li>';
                         });
                         resultsHtml += '</ul>';
                         $('#librarySearchResults').html(resultsHtml);

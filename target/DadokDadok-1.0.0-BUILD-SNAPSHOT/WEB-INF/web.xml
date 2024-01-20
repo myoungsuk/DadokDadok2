@@ -76,4 +76,8 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
+	<!-- 익명사용자 세션 유지 시간 -->
+	<session-config>
+		<session-timeout>86400</session-timeout> <!-- 7일 (분 단위로 설정) -->
+	</session-config>
 </web-app>

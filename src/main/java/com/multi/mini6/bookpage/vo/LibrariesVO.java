@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class LibrariesVO {
 
-    private String 도서관명;
+    private String lib_name;
     private String 주소;
     private String 전화번호;
     private String 팩스번호;

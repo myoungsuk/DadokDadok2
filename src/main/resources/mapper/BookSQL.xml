@@ -4,37 +4,19 @@
 
 <mapper namespace="com.multi.mini6.bookpage.dao.BookDAO">
 
-	<!-- 도서 정보 페이징 처리 리스트 -->
-	<select id="getPagedBooks" parameterType="PageVO" resultType="BookVO">
-		SELECT * FROM (
-						  SELECT
-							  ROW_NUMBER() OVER (ORDER BY book_ISBN DESC) AS book_no,
-								  book_ISBN,
-							  book_name,
-							  book_content,
-							  book_author,
-							  book_publisher,
-							  book_createdAt,
-							  book_genre,
-							  book_img
-						  FROM book
-					  ) row_book
-		WHERE row_book.book_no BETWEEN #{start} AND #{end};
-	</select>
+    <select id="bookSearch" parameterType="string" resultType="booksVO">
+        SELECT * FROM books
+        WHERE (title LIKE CONCAT('%', #{searchKeyword}, '%')
+            OR author LIKE CONCAT('%', #{searchKeyword}, '%')
+            OR publisher LIKE CONCAT('%', #{searchKeyword}, '%')
+            OR subject_classification_number LIKE CONCAT('%', #{searchKeyword}, '%'))
+          AND LENGTH(#{searchKeyword}) >= 2
+        limit 300;
+    </select>
 
-
-
-	<!-- 책 검색 -->
-	<select id="searchBook" parameterType="String" resultType="BookVO">
-		SELECT * FROM book
-		WHERE book_ISBN LIKE CONCAT('%', #{book_ISBN}, '%')
-		   OR book_name LIKE CONCAT('%', #{book_name}, '%')
-		   OR book_content LIKE CONCAT('%', #{book_content}, '%')
-		   OR book_author LIKE CONCAT('%', #{book_author}, '%')
-		   OR book_publisher LIKE CONCAT('%', #{book_publisher}, '%')
-		   OR CAST(book_genre AS CHAR) LIKE CONCAT('%', #{book_genre}, '%')
-	</select>
-
-
-
+    <!-- 도서 정보 가져오기 -->
+    <select id="getBookInfo" parameterType="string" resultType="booksVO">
+        SELECT * FROM books
+        WHERE isbn = #{isbn};
+    </select>
 </mapper>

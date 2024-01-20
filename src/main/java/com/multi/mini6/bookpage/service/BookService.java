@@ -1,13 +1,13 @@
 package com.multi.mini6.bookpage.service;
 
-import com.multi.mini6.bookpage.vo.BookVO;
-import com.multi.mini6.bookpage.vo.PageVO;
 import com.multi.mini6.bookpage.dao.BookDAO;
+import com.multi.mini6.bookpage.vo.BooksVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -17,52 +17,18 @@ import java.util.List;
 @Log4j2
 public class BookService {
 
-	@Autowired
-	private BookDAO bookDAO;
+    private final RestTemplate restTemplate;
+    private final BookDAO bookDAO;
 
 
-	//select문
-	public List<BookVO> getAllBooks() {
+    //도서 검색 기능
+    public List<BooksVO> bookSearch(String searchKeyword) {
+        return bookDAO.bookSearch(searchKeyword);
+    }
 
-		return bookDAO.selectAll();
-	}
-
-	public BookVO getBookByISBN(String bookISBN) {
-		return bookDAO.selectOneByISBN(bookISBN);
-	}
-
-	public BookVO getBookByName(String bookName) {
-		return bookDAO.selectOneByName(bookName);
-	}
-
-	public List<BookVO> getBookByAll(String AllBookThing) {
-		return bookDAO.searchBook(AllBookThing);
-	}
-
-	public List<BookVO> getPagedBooks(PageVO pageVO) {
-		return bookDAO.getPagedBooks(pageVO);
-	}
-
-	public int getBookCount() {
-		return bookDAO.getBookCount();
-	}
-
-
-
-	//insert문
-	public int addBook(BookVO bookVO) {
-		return bookDAO.insertOne(bookVO);
-	}
-
-	//update문
-	public int updateBook(BookVO bookVO) {
-		return bookDAO.updateOne(bookVO);
-	}
-
-	//delete문
-	public int deleteBook(String bookISBN) {
-		return bookDAO.deleteOne(bookISBN);
-	}
-
+    //도서 정보 가져오기
+    public BooksVO getBookInfo(String isbn) {
+        return bookDAO.getBookInfo(isbn);
+    }
 
 }
