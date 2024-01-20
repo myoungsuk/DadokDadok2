@@ -8,10 +8,10 @@ public class BooksVO {
     private String title;
     private String author;
     private String publisher;
-    private String yearOfPublication;
+    private String year_of_publication;
     private String isbn;
-    private String setIsbn;
-    private String additionalSymbol;
+    private String set_isbn;
+    private String additional_symbol;
     private String volume;
-    private String subjectClassificationNumber;
+    private String subject_classification_number;
 }

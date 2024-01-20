@@ -18,7 +18,7 @@
 
         <nav id="navbar" class="navbar">
             <ul>
-                <li><a href="about.jsp">Book</a></li>
+                <li><a href="/bookpage/bookmain">Book</a></li>
                 <li><a href="services.jsp">Library</a></li>
                 <li><a href="testimonials.jsp">ReviewBoard</a></li>
                 <li><a href="pricing.jsp">FreeBoard</a></li>

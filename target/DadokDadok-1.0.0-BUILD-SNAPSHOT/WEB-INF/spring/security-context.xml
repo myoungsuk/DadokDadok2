@@ -54,7 +54,8 @@
 <!--        <security:remember-me token-validity-seconds="60" use-secure-cookie="false"/>-->
     </security:http>
 
-    <!--  secured method  -->
+
+
 
 
     <security:authentication-manager>

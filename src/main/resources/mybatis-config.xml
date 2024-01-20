@@ -9,7 +9,6 @@
 		<typeAlias type="com.multi.mini6.bookpage.vo.BooksLibrariesVO" alias="booksLibrariesVO"></typeAlias>
 		<typeAlias type="com.multi.mini6.bookpage.vo.BooksHistoryVO" alias="booksHistoryVO"></typeAlias>
 		<typeAlias type="com.multi.mini6.bookpage.vo.BooksVO" alias="booksVO"></typeAlias>
-		<typeAlias type="com.multi.mini6.bookpage.vo.BookVO" alias="bookVO"></typeAlias>
 		<typeAlias type="com.multi.mini6.bookpage.vo.PageVO" alias="pageVO"></typeAlias>
 
 		<typeAlias type="com.multi.mini6.loginpage.vo.AuthorityVO" alias="authorityVO"></typeAlias>
