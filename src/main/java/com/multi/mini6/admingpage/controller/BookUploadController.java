@@ -1,6 +1,7 @@
 package com.multi.mini6.admingpage.controller;
 
 import com.multi.mini6.admingpage.service.BookUploadService;
+import com.multi.mini6.admingpage.service.BookUploadService2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class BookUploadController {
 
     final private BookUploadService bookUploadService;
-
+    final private BookUploadService2 bookUploadService2;
     // 책 업로드 관리자 페이지
     // TODO : 관리자만 접근 가능 페이지 권한 설정
     @GetMapping("/BookUploadPage")
@@ -32,7 +33,7 @@ public class BookUploadController {
                                               @RequestParam("lib_code") int libCode) {
         try {
             // 서비스 메소드를 호출하여 파일 처리
-            bookUploadService.importBooksFromExcel(file, libCode);
+            bookUploadService2.importBooksFromExcel2(file, libCode);
             return ResponseEntity.ok().body("파일이 성공적으로 업로드되었습니다.");
         } catch (Exception e) {
             // 예외 발생 시 오류 메시지 반환
@@ -47,7 +48,7 @@ public class BookUploadController {
                                                  @RequestParam("lib_code") int libCode) {
         try {
             // 서비스 메소드를 호출하여 파일 처리
-            bookUploadService.importBooksFromCSV(file, libCode);
+            bookUploadService2.importBooksFromCSV2(file, libCode);
             return ResponseEntity.ok().body("파일이 성공적으로 업로드되었습니다.");
         } catch (Exception e) {
             // 예외 발생 시 오류 메시지 반환

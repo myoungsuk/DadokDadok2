@@ -5,6 +5,28 @@
 <mapper namespace="com.multi.mini6.bookpage.dao.BookDAO">
 
 
+	<!-- 벌크 인서트를 위한 쿼리 -->
+	<insert id="bulkInsertBooks" parameterType="list">
+		INSERT INTO books (title, author, publisher, year_of_publication, isbn, set_isbn,
+		additional_symbol, volume, subject_classification_number)
+		VALUES
+		<foreach collection="list" item="book" separator=",">
+			(#{book.title}, #{book.author}, #{book.publisher}, #{book.year_of_publication},
+			#{book.isbn}, #{book.set_isbn}, #{book.additional_symbol}, #{book.volume},
+			#{book.subject_classification_number})
+		</foreach>
+	</insert>
+
+
+	<select id="findExistingIsbns" resultType="String" parameterType="list">
+		SELECT isbn
+		FROM books
+		WHERE isbn IN
+		<foreach item="isbn" collection="list" open="(" separator="," close=")">
+			#{isbn}
+		</foreach>
+	</select>
+
 	<!-- 도서 엑셀 파일 업로드 -->
 	<!-- ISBN으로 이미 존재하는 책이 있는지 확인하는 쿼리 -->
 	<select id="existsByIsbn" parameterType="String" resultType="int">
@@ -19,8 +41,8 @@
 	<insert id="insertBooks" parameterType="booksVO">
 		INSERT INTO books (title, author, publisher, year_of_publication, isbn, set_isbn,
 						   additional_symbol, volume, subject_classification_number)
-		VALUES (#{title}, #{author}, #{publisher}, #{yearOfPublication}, #{isbn}, #{setIsbn},
-				#{additionalSymbol}, #{volume}, #{subjectClassificationNumber})
+		VALUES (#{title}, #{author}, #{publisher}, #{year_of_publication}, #{isbn}, #{set_isbn},
+				#{additional_symbol}, #{volume}, #{subject_classification_number})
 	</insert>
 	<!-- 도서와도서관 정보를 삽입 -->
 	<insert id="insertBooksLibraries" parameterType="booksLibrariesVO">

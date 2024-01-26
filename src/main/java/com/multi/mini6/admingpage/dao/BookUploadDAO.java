@@ -21,6 +21,9 @@ public class BookUploadDAO {
     @Autowired
     private SqlSessionTemplate sqlSession;
 
+    public List<String> findExistingIsbns(List<String> isbns) {
+        return sqlSession.selectList("findExistingIsbns", isbns);
+    }
     //중복된 ISBN을 찾는 메소드
     public List<String> findDuplicatedIsbns(List<String> isbns) {
         return sqlSession.selectList("findDuplicatedIsbns", isbns);
@@ -39,7 +42,10 @@ public class BookUploadDAO {
         sqlSession.insert("insertBooks", booksVO);
     }
 
-
+    //책 정보 벌크 인서트
+    public void bulkInsertBooks(List<BooksVO> booksList) {
+        sqlSession.insert("bulkInsertBooks", booksList);
+    }
 
     //책과도서관 정보 업데이트
     public void updateBooksLibraries(BooksLibrariesVO booksLibrariesVO) {
